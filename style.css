@@ -1,0 +1,409 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* 좌측 컨트롤 패널 */
+.control-panel {
+    width: 320px;
+    background-color: #0d0d0f;
+    border-right: 1px solid #1f1f23;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+    z-index: 10;
+}
+
+.map-select-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #18181c;
+    border: 1px solid #2d2d35;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.map-select-box img {
+    width: 40px;
+    height: 24px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.map-select-box span {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.map-select-box .arrow {
+    margin-left: auto;
+    font-size: 10px;
+    color: #888;
+}
+
+.map-grid-container {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 288px;
+    background-color: #121215;
+    border: 1px solid #2d2d35;
+    border-radius: 8px;
+    padding: 12px;
+    z-index: 20;
+}
+
+.grid-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: #aaa;
+}
+
+.grid-header button {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.map-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.map-card {
+    cursor: pointer;
+    text-align: center;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid transparent;
+}
+
+.map-card:hover, .map-card.active {
+    border-color: #ef4444;
+}
+
+.map-card img {
+    width: 100%;
+    height: 45px;
+    object-fit: cover;
+    display: block;
+}
+
+.map-card span {
+    font-size: 11px;
+    display: block;
+    background-color: #18181c;
+    padding: 2px 0;
+}
+
+.side-toggle {
+    display: flex;
+    background-color: #18181c;
+    padding: 4px;
+    border-radius: 8px;
+    gap: 4px;
+}
+
+.side-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: #888;
+    padding: 8px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.side-btn.active {
+    background-color: #dc2626;
+    color: #fff;
+}
+
+.section-title {
+    font-size: 11px;
+    color: #666;
+    letter-spacing: 1px;
+}
+
+/* 요원 선택 카드 (어두워지는 현상 수정) */
+.agent-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.agent-card {
+    background-color: #18181c;
+    border: 1px solid #2a2a30;
+    border-radius: 8px;
+    padding: 0;
+    cursor: pointer;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.agent-card.active {
+    border-color: #dc2626;
+    box-shadow: 0 0 8px rgba(220, 38, 38, 0.5);
+}
+
+.agent-card img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    mix-blend-mode: normal;
+    filter: none;
+}
+
+.ability-group {
+    display: flex;
+    gap: 8px;
+}
+
+.ability-btn {
+    flex: 1;
+    height: 44px;
+    background-color: #18181c;
+    border: 1px solid #2a2a30;
+    border-radius: 8px;
+    color: #aaa;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ability-btn img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.ability-btn.active {
+    border-color: #dc2626;
+    background-color: #221215;
+    color: #fff;
+}
+
+/* 메인 맵 뷰포트 */
+.map-viewport {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-color: #050505;
+}
+
+#map-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+#current-map-img {
+    max-height: 90vh;
+    max-width: 100%;
+    display: block;
+    filter: invert(1) hue-rotate(180deg);
+    mix-blend-mode: screen;
+}
+
+#line-svg, #modal-line-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#pins-container, #modal-pins-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* 핀 스타일 (도착 스킬 핀 & 출발 요원 핀 수정) */
+.pin {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid #ef4444;
+    background-color: #0d0d0f;
+    cursor: pointer;
+    pointer-events: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    overflow: hidden;
+}
+
+.pin img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    mix-blend-mode: normal !important;
+    filter: none !important;
+}
+
+.pin.start-agent-pin {
+    border-color: #3b82f6 !important;
+    background-color: #18181c;
+    z-index: 11;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* 모달 및 X버튼 위치 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal-body {
+    background-color: #0f0f12;
+    border: 1px solid #27272a;
+    border-radius: 12px;
+    width: 95%;
+    max-width: 1300px;
+    max-height: 90vh;
+    display: flex;
+    padding: 32px 24px 24px 24px;
+    gap: 24px;
+    position: relative;
+    overflow: visible;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 200;
+    transition: color 0.2s;
+}
+
+.modal-close-btn:hover {
+    color: #fff;
+}
+
+.modal-left {
+    flex: 2.2;
+    display: flex;
+    flex-direction: column;
+}
+
+.video-box {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    height: 0;
+    background-color: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.video-box iframe, .video-box #modal-player {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.modal-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 280px;
+}
+
+.preview-map-box {
+    position: relative;
+    background-color: #050505;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.preview-map-box img {
+    width: 100%;
+    display: block;
+    filter: invert(1) hue-rotate(180deg);
+    mix-blend-mode: screen;
+}
+
+.info-list {
+    background-color: #18181c;
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    color: #aaa;
+}
+
+.info-row strong {
+    color: #fff;
+}

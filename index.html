@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valorant Lineups</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- 유튜브 Iframe Player API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 좌측 선택 패널 -->
+        <aside class="control-panel">
+            <!-- 맵 셀렉트 드롭다운 -->
+            <div class="map-select-box" id="map-select-btn">
+                <img id="selected-map-thumb" src="assets/maps/thumbnails/abyss.jpg" alt="Map">
+                <span id="selected-map-name">Abyss</span>
+                <span class="arrow">▼</span>
+            </div>
+
+            <!-- 맵 선택 그리드 모달 -->
+            <div class="map-grid-container hidden" id="map-grid-modal">
+                <div class="grid-header">
+                    <span>Select Map</span>
+                    <button id="close-map-grid">&times;</button>
+                </div>
+                <div class="map-grid" id="map-grid"></div>
+            </div>
+
+            <!-- 공수 필터 -->
+            <div class="side-toggle">
+                <button class="side-btn active" data-side="Attacker">Attacker</button>
+                <button class="side-btn" data-side="Defender">Defender</button>
+            </div>
+
+            <!-- 요원 선택 그리드 -->
+            <div class="section-title">SELECT AN AGENT</div>
+            <div class="agent-grid" id="agent-grid">
+                <button class="agent-card active" data-agent="Yoru">
+                    <img src="assets/agents/Yoru-Profile.jpg" alt="Yoru">
+                </button>
+            </div>
+
+            <!-- 스킬 선택 필터 -->
+            <div class="section-title">ABILITIES</div>
+            <div class="ability-group" id="ability-filters">
+                <button class="ability-btn active" data-ability="All">ALL</button>
+                <button class="ability-btn" data-ability="Q">
+                    <img src="assets/skills/yoru_q.png" alt="Q">
+                </button>
+                <button class="ability-btn" data-ability="E">
+                    <img src="assets/skills/yoru_e.png" alt="E">
+                </button>
+                <button class="ability-btn" data-ability="C">
+                    <img src="assets/skills/yoru_c.png" alt="C">
+                </button>
+            </div>
+        </aside>
+
+        <!-- 메인 맵 뷰포트 -->
+        <main class="map-viewport">
+            <div id="map-wrapper">
+                <img id="current-map-img" src="assets/maps/minimaps/abyss.png" alt="Map">
+                <svg id="line-svg"></svg>
+                <div id="pins-container"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 상세 영상 모달 -->
+    <div id="detail-modal" class="modal hidden">
+        <div class="modal-body">
+            <!-- 닫기(X) 버튼 -->
+            <button class="modal-close-btn" id="close-detail-modal">&times;</button>
+            
+            <div class="modal-left">
+                <div class="video-box">
+                    <div id="modal-player"></div>
+                </div>
+                <h2 id="modal-video-title">Lineup Title</h2>
+            </div>
+
+            <div class="modal-right">
+                <div class="preview-map-box">
+                    <img id="modal-map-img" src="assets/maps/minimaps/abyss.png" alt="Map Preview">
+                    <svg id="modal-line-svg"></svg>
+                    <div id="modal-pins-container"></div>
+                </div>
+
+                <div class="info-list">
+                    <div class="info-row"><span>Map</span><strong id="info-map">Abyss</strong></div>
+                    <div class="info-row"><span>Agent</span><strong id="info-agent">Yoru</strong></div>
+                    <div class="info-row"><span>Side</span><strong id="info-side">Attacker</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 스크립트 불러오기 -->
+    <script src="js/data/lineups/yoru/abyss.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
