@@ -153,7 +153,6 @@ body {
     letter-spacing: 1px;
 }
 
-/* 요원 선택 카드 (어두워지는 현상 수정) */
 .agent-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -258,7 +257,7 @@ body {
     pointer-events: none;
 }
 
-/* 핀 스타일 (도착 스킬 핀 & 출발 요원 핀 수정) */
+/* 핀 스타일 */
 .pin {
     position: absolute;
     transform: translate(-50%, -50%);
@@ -289,6 +288,7 @@ body {
     border-color: #3b82f6 !important;
     background-color: #18181c;
     z-index: 11;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
 }
 
 .hidden {

@@ -1,4 +1,34 @@
-const mapList = ["abyss", "ascent", "bind", "breeze", "corrode", "fracture", "haven", "icebox", "lotus", "pearl", "split", "summit", "sunset"];
+// 라인업 데이터
+const abyssLineups = [
+    {
+        id: "yoru-abyss-tp-1",
+        agent: "Yoru",
+        map: "Abyss",
+        side: "Attacker",
+        ability: "E",
+        title: "A 메인 -> A 사이트 백사이트 텔포",
+        start: { x: 69.2, y: 17.3 },
+        end:   { x: 32.4, y: 2.1 },
+        youtubeId: "Vg5MMIQUnio",
+        startTime: 6,
+        endTime: 30
+    },
+    {
+        id: "yoru-abyss-tp-2",
+        agent: "Yoru",
+        map: "Abyss",
+        side: "Attacker",
+        ability: "E",
+        title: "미드 -> B 사이트 헤븐 텔포",
+        start: { x: 65.3, y: 35.8 },
+        end:   { x: 27.0, y: 83.3 },
+        youtubeId: "WGeE5j3W5HY",
+        startTime: 1,
+        endTime: 20
+    }
+];
+
+const mapList = ["abyss", "ascent", "bind", "breeze", "fracture", "haven", "icebox", "lotus", "pearl", "split", "sunset"];
 
 let state = {
     map: "Abyss",
@@ -10,25 +40,7 @@ let state = {
 let player = null;
 let stopTimer = null;
 
-// 1. 초기화
-function init() {
-    renderMapGrid();
-    setupEventListeners();
-    setupCoordinateLogger();
-    updateView();
-}
-
-// 2. 맵 클릭 좌표 콘솔 출력 (F12)
-function setupCoordinateLogger() {
-    currentMapImg.addEventListener("click", (e) => {
-        const rect = currentMapImg.getBoundingClientRect();
-        const x = (((e.clientX - rect.left) / rect.width) * 100).toFixed(1);
-        const y = (((e.clientY - rect.top) / rect.height) * 100).toFixed(1);
-        console.log(`[클릭 좌표] x: ${x}, y: ${y}`);
-    });
-}
-
-// 3. DOM 요소 참조
+// DOM 요소 참조
 const mapSelectBtn = document.getElementById("map-select-btn");
 const mapGridModal = document.getElementById("map-grid-modal");
 const closeMapGridBtn = document.getElementById("close-map-grid");
@@ -38,7 +50,12 @@ const pinsContainer = document.getElementById("pins-container");
 const lineSvg = document.getElementById("line-svg");
 const detailModal = document.getElementById("detail-modal");
 
-// 4. 맵 선택 그리드
+function init() {
+    renderMapGrid();
+    setupEventListeners();
+    updateView();
+}
+
 function renderMapGrid() {
     mapGridEl.innerHTML = "";
     mapList.forEach(mapName => {
@@ -62,83 +79,89 @@ function renderMapGrid() {
     });
 }
 
-// 5. 화면 업데이트
 function updateView() {
     currentMapImg.src = `assets/maps/minimaps/${state.map.toLowerCase()}.png`;
-    clearLines();
+    lineSvg.innerHTML = "";
     renderPins();
 }
 
-// 6. 데이터 가져오기
-function getAllLineups() {
-    let allData = [];
-    if (typeof abyssLineups !== "undefined") allData = allData.concat(abyssLineups);
-    return allData;
-}
-
-// 7. 핀 렌더링
+// 📌 핀 렌더링: 기본으로는 스킬 아이콘만 생성하고, 마우스를 올릴 때 요루 얼굴과 궤적이 나타남
 function renderPins() {
     pinsContainer.innerHTML = "";
-    const allData = getAllLineups();
+    lineSvg.innerHTML = "";
 
-    const filtered = allData.filter(item => {
+    const filtered = abyssLineups.filter(item => {
         const mapMatch = item.map.toLowerCase() === state.map.toLowerCase();
         const sideMatch = item.side === state.side;
-        const abilityMatch = (state.ability === "All" || item.ability === state.ability);
+        const abilityMatch = (state.ability === "All" || item.ability.toUpperCase() === state.ability.toUpperCase());
         return mapMatch && sideMatch && abilityMatch;
     });
 
     filtered.forEach(lineup => {
-        const pin = document.createElement("div");
-        pin.className = "pin";
-        pin.style.left = `${lineup.end.x}%`;
-        pin.style.top = `${lineup.end.y}%`;
-        pin.innerHTML = `<img src="assets/skills/yoru_${lineup.ability.toLowerCase()}.png" alt="${lineup.ability}">`;
+        // 1. 도착 지점 핀 (항상 보이는 스킬 아이콘)
+        const targetPin = document.createElement("div");
+        targetPin.className = "pin";
+        targetPin.style.left = `${lineup.end.x}%`;
+        targetPin.style.top = `${lineup.end.y}%`;
+        const skillFileName = `yoru_${lineup.ability.toLowerCase()}`;
+        targetPin.innerHTML = `<img src="assets/skills/${skillFileName}.png" alt="${lineup.ability}">`;
 
-        pin.addEventListener("mouseenter", () => showHoverPath(lineup));
-        pin.addEventListener("mouseleave", clearLines);
-        pin.addEventListener("click", () => openDetailModal(lineup));
+        // 2. 출발 지점 핀 (평소엔 숨겨져 있다가 마우스 올리면 생성될 요루 얼굴 핀 엘리먼트)
+        let startPin = null;
 
-        pinsContainer.appendChild(pin);
+        const handleEnter = () => {
+            // 궤적 그리기
+            lineSvg.innerHTML = `
+                <line 
+                    x1="${lineup.start.x}%" y1="${lineup.start.y}%" 
+                    x2="${lineup.end.x}%" y2="${lineup.end.y}%" 
+                    stroke="#f59e0b" 
+                    stroke-width="3"
+                    stroke-dasharray="5,5"
+                />
+            `;
+
+            // 요루 얼굴 핀 생성해서 추가
+            if (!startPin) {
+                startPin = document.createElement("div");
+                startPin.className = "pin start-agent-pin";
+                startPin.style.left = `${lineup.start.x}%`;
+                startPin.style.top = `${lineup.start.y}%`;
+                startPin.innerHTML = `<img src="assets/agents/Yoru-Profile.jpg" alt="Yoru">`;
+                
+                // 요루 얼굴 핀을 눌러도 모달이 열리게
+                startPin.addEventListener("click", () => openDetailModal(lineup));
+                pinsContainer.appendChild(startPin);
+            }
+        };
+
+        const handleLeave = () => {
+            // 마우스가 멀어지면 궤적과 요루 얼굴 제거
+            lineSvg.innerHTML = "";
+            if (startPin) {
+                startPin.remove();
+                startPin = null;
+            }
+        };
+
+        const handleClick = () => openDetailModal(lineup);
+
+        // 스킬 아이콘에 마우스 이벤트 바인딩
+        targetPin.addEventListener("mouseenter", handleEnter);
+        targetPin.addEventListener("mouseleave", handleLeave);
+        targetPin.addEventListener("click", handleClick);
+
+        pinsContainer.appendChild(targetPin);
     });
 }
 
-// 8. 호버 패스
-function showHoverPath(lineup) {
-    lineSvg.innerHTML = `
-        <line 
-            x1="${lineup.start.x}%" y1="${lineup.start.y}%" 
-            x2="${lineup.end.x}%" y2="${lineup.end.y}%" 
-            stroke="#f59e0b" 
-            stroke-width="3"
-            stroke-dasharray="5,5"
-        />
-    `;
-
-    const agentPin = document.createElement("div");
-    agentPin.className = "pin start-agent-pin";
-    agentPin.id = "active-start-pin";s
-    agentPin.style.left = `${lineup.start.x}%`;
-    agentPin.style.top = `${lineup.start.y}%`;
-    agentPin.innerHTML = `<img src="assets/agents/Yoru-Profile.jpg" alt="Yoru">`;
-
-    pinsContainer.appendChild(agentPin);
-}
-
-function clearLines() {
-    lineSvg.innerHTML = "";
-    const activeStartPin = document.getElementById("active-start-pin");
-    if (activeStartPin) activeStartPin.remove();
-}
-
-// 9. 비디오 모달 및 유튜브 API 파싱 (구간 무한 반복 재생 적용)
+// 영상 모달 열기
 function openDetailModal(lineup) {
     const startSec = lineup.startTime || 0;
     const endSec = lineup.endTime || null;
 
     if (stopTimer) clearInterval(stopTimer);
 
-    // 유튜브 플레이어 생성/재생
     if (player && typeof player.loadVideoById === "function") {
         player.loadVideoById({
             videoId: lineup.youtubeId,
@@ -148,18 +171,11 @@ function openDetailModal(lineup) {
     } else {
         player = new YT.Player('modal-player', {
             videoId: lineup.youtubeId,
-            playerVars: {
-                'autoplay': 1,
-                'start': startSec,
-                'end': endSec
-            },
-            events: {
-                'onReady': (e) => e.target.playVideo()
-            }
+            playerVars: { 'autoplay': 1, 'start': startSec, 'end': endSec },
+            events: { 'onReady': (e) => e.target.playVideo() }
         });
     }
 
-    // endTime 도달 시 startTime으로 돌아가는 구간 무한 루프 타이머
     if (endSec) {
         stopTimer = setInterval(() => {
             if (player && typeof player.getCurrentTime === "function") {
@@ -196,14 +212,11 @@ function openDetailModal(lineup) {
 }
 
 function closeModal() {
-    if (player && typeof player.stopVideo === "function") {
-        player.stopVideo();
-    }
+    if (player && typeof player.stopVideo === "function") player.stopVideo();
     if (stopTimer) clearInterval(stopTimer);
     detailModal.classList.add("hidden");
 }
 
-// 10. 이벤트 등록
 function setupEventListeners() {
     mapSelectBtn.addEventListener("click", () => mapGridModal.classList.toggle("hidden"));
     closeMapGridBtn.addEventListener("click", () => mapGridModal.classList.add("hidden"));
@@ -220,8 +233,9 @@ function setupEventListeners() {
     document.querySelectorAll(".ability-btn").forEach(btn => {
         btn.addEventListener("click", (e) => {
             document.querySelectorAll(".ability-btn").forEach(b => b.classList.remove("active"));
-            e.currentTarget.classList.add("active");
-            state.ability = e.currentTarget.dataset.ability;
+            const targetBtn = e.currentTarget;
+            targetBtn.classList.add("active");
+            state.ability = targetBtn.dataset.ability;
             updateView();
         });
     });
